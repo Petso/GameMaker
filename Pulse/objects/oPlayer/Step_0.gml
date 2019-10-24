@@ -10,8 +10,14 @@ if (abs(gamepad_axis_value(0, gp_axislh)) > 0.2) {
 	key_left = abs(min(gamepad_axis_value(0, gp_axislh), 0));
 	key_right = max(gamepad_axis_value(0, gp_axislh), 0);
 }
-if (gamepad_button_check(0, gp_face1)) {
+if (!jumpexpired && gamepad_button_check_released(0, gp_face1)) {
+	jumpexpired = true;
+}
+if (gamepad_button_check_pressed(0, gp_face1) && jumpexpired) {
 	key_jump = 1;
+	jumpexpired = false;
+}
+if (gamepad_button_check(0, gp_face1)) {
 	key_jump_held = 1;
 }
 
@@ -31,7 +37,6 @@ if (!key_right && !key_left) || (key_right && key_left) {
 }
 
 // Jump Controls
-// FIXME: 
 if (place_meeting(x, y + 1, oWall)) {
 	vsp = key_jump * -jumpspeed;
 }
@@ -40,7 +45,6 @@ if (vsp < 0) && (!key_jump_held) {
 }
 
 // Vertical Acceleration and Movement Calculations
-// FIXME:
 if (vsp < fallspeed) {
 	vsp = vsp + grv;
 }

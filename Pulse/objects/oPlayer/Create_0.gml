@@ -9,3 +9,4 @@ grv = 0.6;
 fallspeed = 8;
 jumpspeed = 12;
 shorthopfriction = jumpspeed / 2;
+jumpexpired = true;
