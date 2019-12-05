@@ -1,4 +1,4 @@
-/// @description Insert description here
+/// @description
 // Keyboard Controls
 key_left = keyboard_check(vk_left);
 key_right = keyboard_check(vk_right);
@@ -22,53 +22,140 @@ if (gamepad_button_check(0, gp_face1)) {
 }
 
 // Horizontal Acceleration and Movement Calculations
-if (key_right) {
-	if (hsp < hsp_max - accel) hsp += accel;
-	if (hsp >= hsp_max - accel) hsp = hsp_max;
-}
-if (key_left){
-    if (hsp > -hsp_max + accel) hsp -= accel;
-    if (hsp <= -hsp_max + accel) hsp = -hsp_max;
-    }
-if (!key_right && !key_left) || (key_right && key_left) {
-    if (hsp >= decel) hsp -= decel;
-    if (hsp <= -decel) hsp += decel;
-    if (hsp > -decel) && (hsp < decel) hsp = 0;
-}
-
-// Jump Controls
-if (place_meeting(x, y + 1, oWall)) {
-	vsp = key_jump * -jumpspeed;
-}
-if (vsp < 0) && (!key_jump_held) {
-	vsp = max(vsp, -shorthopfriction)
-}
-
-// Vertical Acceleration and Movement Calculations
-if (vsp < fallspeed) {
-	vsp = vsp + grv;
-}
-
-
-// Horizontal Collision
-if (place_meeting(x + hsp, y, oWall)) {
-	while (!place_meeting(x + sign(hsp), y, oWall)) {
-		x = x + sign(hsp);
+//if (key_right) {
+//	if (hsp < hsp_max - accel) hsp += accel;
+//	if (hsp >= hsp_max - accel) hsp = hsp_max;
+//}
+//if (key_left){
+//    if (hsp > -hsp_max + accel) hsp -= accel;
+//    if (hsp <= -hsp_max + accel) hsp = -hsp_max;
+//    }
+//if (!key_right && !key_left) || (key_right && key_left) {
+//    if (hsp >= decel) hsp -= decel;
+//    if (hsp <= -decel) hsp += decel;
+//    if (hsp > -decel) && (hsp < decel) hsp = 0;
+//}
+walljumpdelay = max(walljumpdelay - 1, 0);
+if (walljumpdelay == 0) {
+	var dir = key_right - key_left;
+	hsp += dir * hsp_acc;
+	if (dir == 0) {
+		var hsp_fric_final = hsp_fric_ground;
+		if (!onground) hsp_fric_final = hsp_fric_air;
+		hsp = Approach(hsp, 0, hsp_fric_final);
 	}
-	hsp = 0;
+	hsp = clamp(hsp, -hsp_walk, hsp_walk);
 }
-x = x + hsp;
 
-// Vertical Collision
+// Wall Jump
+if (onwall != 0) && (!onground) && (key_jump) {
+	walljumpdelay = walljumpdelay_max;
+	hsp = -onwall * hsp_wjump;
+	vsp = vsp_wjump;
+	
+	hsp_frac = 0;
+	vsp_frac = 0;
+}
+
+// Vertical Physics for regular gravity
+if (!global.reverseGrav) {
+	//if (place_meeting(x, y + 1, oWall)) {
+	//	vsp = key_jump * -jumpspeed;
+	//}
+	//if (vsp < 0) && (!key_jump_held) {
+	//	vsp = max(vsp, -shorthopfriction)
+	//}
+	//// Vertical Acceleration and Movement Calculations
+	//if (vsp < fallspeed) {
+	//	vsp = vsp + grv;
+	//}
+	var grv_final = grv;
+	var vsp_max_final = vsp_max;
+	if (onwall != 0) && (vsp > 0) {
+		grv_final = grv_wall;
+		vsp_max_final = vsp_max_wall;
+	}
+	vsp += grv;
+	vsp = clamp(vsp, -vsp_max_final, vsp_max_final);
+	
+	// Jumping
+	if (jumpbuffer > 0) {
+		jumpbuffer--;
+		if (key_jump) {
+			jumpbuffer = 0;
+			vsp = vsp_jump;
+			vsp_frac = 0;
+		}
+	}
+	// Shorthopping
+	if (vsp < 0) && (!key_jump_held) vsp = max(vsp, shorthopfriction)
+	// Vertical Wall Collision
 	if (place_meeting(x, y + vsp, oWall)) {
 		while (!place_meeting(x, y + sign(vsp), oWall)) {
 			y = y + sign(vsp);
 		}
 		vsp = 0;
 	}
+	// Vertical Move
 	y = y + vsp;
+}
+// Vertical Physics for reverse gravity
+if (global.reverseGrav) {
+	//TODO:
+}
 
-// Animation
+// Dump fractions and get final integer speeds
+hsp += hsp_frac;
+vsp += vsp_frac;
+hsp_frac = frac(hsp);
+vsp_frac = frac(vsp);
+hsp -= hsp_frac;
+vsp -= vsp_frac;
+
+// Horizontal Wall Collision
+if (place_meeting(x + hsp, y, oWall)) {
+	while (!place_meeting(x + sign(hsp), y, oWall)) {
+		x = x + sign(hsp);
+	}
+	hsp = 0;
+}
+// Horizontal Move
+x = x + hsp;
+
+//Calc current status
+onground = place_meeting(x, y + 1, oWall);
+onwall = place_meeting(x+1, y, oWall) - place_meeting(x-1, y, oWall);
+if (onground) jumpbuffer = 6;
+
+// Death State
+if (place_meeting(x, y, oDeath)) {
+	dead = true;
+}
+if (dead) {
+	instance_destroy();
+}
+
+// Adjust sprite
 if (hsp != 0) {
 	image_xscale = sign(hsp);
 }
+if (!onground) {
+	if (onwall != 0) {
+		//sprite_index = sPlayer_wall;
+		//image_xscale = onwall;
+		var side = bbox_left;
+		if (onwall == 1) side = bbox_right;
+		dust++;
+		if ((dust > 2) && (vsp > 0)) with (instance_create_layer(side, bbox_top, "Behind", oDust)) {
+			other.dust = 0;
+			hspeed = -other.onwall * 0.5;
+		}
+	} else {
+		dust = 0;
+		// Todo: Add falling animation
+		//sprite_index = sPlayer_air;
+		//image_speed = 0;
+		//image_index = 0;
+	}
+}
+	
