@@ -3,7 +3,8 @@
 key_left = keyboard_check(vk_left);
 key_right = keyboard_check(vk_right);
 key_jump = keyboard_check_pressed(vk_space);
-key_jump_held = keyboard_check(vk_space)
+key_jump_held = keyboard_check(vk_space);
+key_wall_grab = keyboard_check(vk_shift);
 
 // Gamepad Controls
 if (abs(gamepad_axis_value(0, gp_axislh)) > 0.2) {
@@ -74,9 +75,16 @@ if (!global.reverseGrav) {
 	if (onwall != 0) && (vsp > 0) {
 		grv_final = grv_wall;
 		vsp_max_final = vsp_max_wall;
+		if (key_wall_grab) {
+			vsp = 0;
+		} else {
+			vsp += grv;
+			vsp = clamp(vsp, -vsp_max_final, vsp_max_final);
+		}
+	} else {
+		vsp += grv;
+		vsp = clamp(vsp, -vsp_max_final, vsp_max_final);
 	}
-	vsp += grv;
-	vsp = clamp(vsp, -vsp_max_final, vsp_max_final);
 	
 	// Jumping
 	if (jumpbuffer > 0) {
