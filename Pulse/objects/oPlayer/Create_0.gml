@@ -12,7 +12,7 @@ hsp_wjump = 4;
 vsp_frac = 0;
 vsp_max = 10;
 vsp = 0;
-vsp_jump = -6;
+vsp_jump = -8;
 vsp_wjump = -5;
 vsp_max_wall = 4;
 

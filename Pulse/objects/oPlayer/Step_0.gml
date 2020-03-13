@@ -5,6 +5,22 @@ key_right = keyboard_check(vk_right);
 key_jump = keyboard_check_pressed(vk_space);
 key_jump_held = keyboard_check(vk_space);
 key_wall_grab = keyboard_check(vk_shift);
+key_switch_grav = keyboard_check_pressed(ord("D"));
+
+// Gravity Settings
+//if (key_switch_grav) {
+//	vsp_max = -1 * vsp_max;
+//	vsp_jump = -1 * vsp_jump;
+//	vsp_wjump = -1 * vsp_wjump;
+//	vsp_max_wall = -1 * vsp_max_wall;
+
+//	grv = -1 * grv;
+//	grv_wall = -1 * grv_wall;
+//	fallspeed = -1 * fallspeed;
+//	jumpspeed = -1 * jumpspeed;
+//	shorthopfriction = -1 * shorthopfriction;
+//}
+	
 
 // Gamepad Controls
 if (abs(gamepad_axis_value(0, gp_axislh)) > 0.2) {
