@@ -223,6 +223,14 @@
             }
         },
         {
+            "Key": "d16f7de0-09ba-4719-96db-09f60f222145",
+            "Value": {
+                "id": "0921a936-8687-4651-a45d-091cfa7d07b3",
+                "resourcePath": "sprites\\sPlayerRun\\sPlayerRun.yy",
+                "resourceType": "GMSprite"
+            }
+        },
+        {
             "Key": "e0e49a75-bb72-4145-83c9-96fd7eb8557c",
             "Value": {
                 "id": "20c86360-d415-4f0d-97e3-0cd64b367b20",

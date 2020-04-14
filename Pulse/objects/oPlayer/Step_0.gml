@@ -37,7 +37,6 @@ if (gamepad_button_check_pressed(0, gp_face1) && jumpexpired) {
 if (gamepad_button_check(0, gp_face1)) {
 	key_jump_held = 1;
 }
-
 // Horizontal Acceleration and Movement Calculations
 //if (key_right) {
 //	if (hsp < hsp_max - accel) hsp += accel;
@@ -159,7 +158,22 @@ if (dead) {
 	instance_destroy();
 }
 
-// Adjust sprite
+// Animations
+image_speed = 1;
+if (!place_meeting(x, y + 1, oWall)) {
+	sprite_index = sPlayer;
+}
+else
+{
+	image_speed = 1;
+	if (hsp == 0) {
+		sprite_index = sPlayer;
+	}
+	else
+	{
+		sprite_index = sPlayerRun;
+	}
+}
 if (hsp != 0) {
 	image_xscale = sign(hsp);
 }
@@ -176,7 +190,7 @@ if (!onground) {
 		}
 	} else {
 		dust = 0;
-		// Todo: Add falling animation
+		// TODO: Add falling animation
 		//sprite_index = sPlayer_air;
 		//image_speed = 0;
 		//image_index = 0;
