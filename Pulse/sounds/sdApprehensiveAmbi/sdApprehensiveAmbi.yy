@@ -1,5 +1,5 @@
 {
-    "id": "c65f6df0-cc1b-45d9-9c22-00d91754431c",
+    "id": "592ad710-4e88-4ecc-9afd-c19f378aa7e9",
     "modelName": "GMSound",
     "mvc": "1.0",
     "name": "sdApprehensiveAmbi",
@@ -10,5 +10,5 @@
     "preload": false,
     "sampleRate": 44100,
     "type": 0,
-    "volume": 0.2
+    "volume": 0.33
 }
