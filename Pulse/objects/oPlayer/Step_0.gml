@@ -156,6 +156,16 @@ if (place_meeting(x, y, oDeath)) {
 }
 if (dead) {
 	instance_destroy();
+	instance_create_layer(xstart, ystart, "Instances", oPlayer);
+}
+
+// Door State
+if (place_meeting(x, y, oDoorL)) {
+	audio_play_sound(sdDoor, 2, false);
+	instance_destroy();
+	with(oDoorL) {
+		sprite_index = sDoorOpen;
+	}
 }
 
 // Animations
